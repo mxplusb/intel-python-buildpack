@@ -63,7 +63,7 @@ CONDA_ENV="root"
 # First check if environment.yml exists and if so use with conda-env
 if [ -e "$BUILD_DIR/environment.yml" ]; then
     echo "-----> Installing conda environment from environment.yml..."
-    $CONDA_BIN/conda env update -n root -f "$BUILD_DIR/environment.yml"
+    $CONDA_BIN/conda env update --quiet -n root -f "$BUILD_DIR/environment.yml"
 else
     # No conda environment so use traditional requirements files.
     if [ -e "$BUILD_DIR/conda_requirements.txt" ]; then
@@ -83,7 +83,11 @@ grep -rlI $BUILD_DIR $BUILD_DIR | xargs sed -i.bak "s|$BUILD_DIR|/home/vcap/app|
 #
 
 # Add Conda path to profile
+# Add intel EULA acceptance.
 mkdir -p $(dirname $PROFILE_PATH)
-echo "export PATH=$HOME/app/.conda/bin:\$PATH" >> $PROFILE_PATH
+cat << EOF > $PROFILE_PATH
+export PATH=$HOME/app/.conda/bin:$PATH
+export ACCEPT_INTEL_PYTHON_EULA=yes
+EOF
 
 echo "-----> Finished compile step"
